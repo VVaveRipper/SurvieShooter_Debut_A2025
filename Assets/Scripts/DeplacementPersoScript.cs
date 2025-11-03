@@ -19,7 +19,11 @@ public class DeplacementPersoScript : MonoBehaviour
     void Start()
     {
         // Active le verrouillage du curseur seulement si l'option est cochée. Utilie seulement avec la caméra simple "rotate".
-        if(curseurLock)Cursor.lockState = CursorLockMode.Locked;
+        //************
+        if (curseurLock) Cursor.lockState = CursorLockMode.Locked;
+
+        Vector3 test = new Vector3(1, 0, 1);
+        print(test.normalized);
     }
 
 
@@ -32,6 +36,8 @@ public class DeplacementPersoScript : MonoBehaviour
         /* ### déplacement du perso ###
         On commence par récupérer les valeurs de l'axe vertical et de l'axe horizontal. 
         GetAxisRaw renvoie une valeur soit de -1, 0 ou 1. Aucune progression comme avec GetAxis.*/
+        //There is no linear progression like with GetAxis.*/
+        //it jumps directly from -1 to 1.
         float axeH = Input.GetAxisRaw("Horizontal");
         float axeV = Input.GetAxisRaw("Vertical");
         /*
@@ -41,17 +47,24 @@ public class DeplacementPersoScript : MonoBehaviour
         horizontal. Ce vecteur doit être normalisé (pour éviter que le personnage se déplace plus vite en diagonale.
         On multiplie ce vecteur par la variable vitesseDeplacementPerso pour pouvoir ajuste la vitesse de déplacement.*/
 
+        Vector3 vecteurDeplacement = new Vector3(axeH, 0, axeV).normalized * vitesseDeplacementPerso;
+
+        GetComponent<Rigidbody>().linearVelocity = vecteurDeplacement;
+
         //----------------------------------------------------------------------------------------------
 
         /* ### rotation du personnage simple ###
          * on tourne le personnage en fonctione du déplacement horizontal de la souris. On mutliplie par la variable
          * vitesseRotationPerso pour pouvoir contrôler la vitesse de rotation*/
-        float tourne = Input.GetAxis("Mouse X") * vitesseRotationPerso;
-        transform.Rotate(0f, tourne, 0f);
+
+         //le float ci dessous est commenté
+
+        // float tourne = Input.GetAxis("Mouse X") * vitesseRotationPerso;
+        // transform.Rotate(0f, tourne, 0f);
 
         /* ### rotation du personnage complexe, mais plus précise pour le tir. Activer cette fonction pour qu'elle s'exécute
          * et mettre en commentaire la rotation simple.*/
-        //TournePersonnage();
+        TournePersonnage();
 
         //----------------------------------------------------------------------------------------------
 
@@ -100,6 +113,9 @@ public class DeplacementPersoScript : MonoBehaviour
          * 5- le layerMask qui permet de tenir compte seulement des objets qui sont sur ce layer.*/
 
         if (Physics.Raycast(camRay.origin, camRay.direction, out infoCollision, 5000, LayerMask.GetMask("plancher")))
+
+        transform.LookAt(infoCollision.point);
+
         {
             // si le rayon frappe le plancher...
             // le personnage regarde vers le point de contact (là ou le rayon à touché le plancher)
